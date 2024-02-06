@@ -53,7 +53,7 @@ export function getAllCollections() {
 
 // Get Collection By UserId
 export function getCollectionsByUserId(user_id: String) {
-    return http.get(`${collectionEndPoint}/collections/${user_id}`);
+    return http.get(`${collectionEndPoint}/user/${user_id}`);
 }
 
 // Create Collection: [user_id, name]

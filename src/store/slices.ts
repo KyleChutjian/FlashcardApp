@@ -7,8 +7,19 @@ const initialUserState = {
     },
 };
 
-const initialCollectionsState = {
-    collections: [""]
+type Collection = {
+    collection_id: string;
+    user_id: string;
+    name: string;
+    created_at: string;
+}
+
+interface CollectionState {
+    collections: Collection[];
+}
+
+const initialCollectionsState: CollectionState = {
+    collections: [],
 };
 
 
@@ -28,7 +39,7 @@ export const collectionsSlice = createSlice({
     name: "collections",
     initialState: initialCollectionsState,
     reducers: {
-        setSelectedCollections: (state, action: PayloadAction<{collections: Array<string>}>) => {
+        setSelectedCollections: (state, action: PayloadAction<{collections: Array<Collection>}>) => {
             state.collections = action.payload.collections
         }
     }

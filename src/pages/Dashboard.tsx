@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import { getCollectionsByUserId, createCollection, updateCollection } from "../api";
@@ -6,14 +6,21 @@ import { useAppSelector } from "../store/Store";
 
 const Dashboard = () => {
     const userInfo = useAppSelector(state=> state.user.userInfo);
-    console.log(userInfo);
 
     const selectedCollections = useAppSelector(state => state.collections.collections);
-    console.log(selectedCollections);
 
-    const [ collections, setCollections ] = useState(null);
+    const [ collections, setCollections ] = useState(selectedCollections);
 
+    useEffect(() => {
+        // Get collections by UserId when page loads
+        getCollectionsByUserId(userInfo.user_id).then((res) => {
+            setCollections(res.data);
+        });
+    }, [])
 
+    useEffect(() => {
+        // console.log(collections);
+    }, [collections])
 
     return(
         <div>
@@ -32,7 +39,13 @@ const Dashboard = () => {
 
             {/* Collections Grid */}
             <div className="grid grid-cols-4 gap-4">
-
+                {collections ? 
+                    collections.map((value, key) => {
+                        console.log(value);
+                        return <div key={key}>collection_id: {value.collection_id}</div>
+                    })
+                 : <div></div>
+                }
             </div>
 
         </div>
