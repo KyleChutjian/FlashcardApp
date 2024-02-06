@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../api";
 import { useContext } from "react";
 import { useAppDispatch } from "../store/Store";
-import { setLoginData } from "../store/userSlice";
+import { setLoginData } from "../store/slices";
 
 
 const Login = () => {

@@ -8,6 +8,9 @@ const Dashboard = () => {
     const userInfo = useAppSelector(state=> state.user.userInfo);
     console.log(userInfo);
 
+    const selectedCollections = useAppSelector(state => state.collections.collections);
+    console.log(selectedCollections);
+
     const [ collections, setCollections ] = useState(null);
 
 
