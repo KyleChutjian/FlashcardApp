@@ -2,12 +2,14 @@ import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import { getCollectionsByUserId, createCollection, updateCollection } from "../api";
+import { useAppSelector } from "../store/Store";
 
 const Dashboard = () => {
+    const userInfo = useAppSelector(state=> state.user.userInfo);
+    console.log(userInfo);
 
     const [ collections, setCollections ] = useState(null);
 
-    // getCollectionsByUserId()
 
 
     return(

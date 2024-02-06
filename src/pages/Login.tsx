@@ -1,27 +1,48 @@
-import React, {ButtonHTMLAttributes, ChangeEvent, DetailedHTMLProps, MouseEventHandler, useState} from "react";
+import React, { ChangeEvent, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api";
+import { useContext } from "react";
+import { useAppDispatch } from "../store/Store";
+import { setLoginData } from "../store/userSlice";
+
 
 const Login = () => {
+    // const {handleLogin} = useContext(Context);
+    const dispatch = useAppDispatch();
+
+
     const router = useNavigate();
 
-    const [ loginData, setLoginData ] = useState({
+    const [ loginInfo, setLoginInfo ] = useState({
         email: null,
         password: null
     });
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setLoginData((prev) => ({
+        setLoginInfo((prev) => ({
             ...prev,
             [name]: value,
         }));
     }
 
-    const handleLogin = () => {
-        
-        login(loginData).then((res) => {
+    const handleLoginSubmit = () => {
+
+
+
+        login(loginInfo).then((res) => {
             if (res.status === 200) {
+
+                console.log(`user_id: ${res.data.user_id}`);
+                console.log(`name: ${res.data.name}`);
+
+                dispatch(setLoginData({
+                    user_id: res.data.user_id,
+                    name: res.data.name
+                }));
+
+
+
                 router("/dashboard");
             } else {
                 throw console.error("Invalid Response");
@@ -76,7 +97,7 @@ const Login = () => {
                     </div>
 
                     {/* Login Button */}
-                    <button onClick={handleLogin} className="w-[40%] t-5 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</button>
+                    <button onClick={handleLoginSubmit} className="w-[40%] t-5 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</button>
                     
                     
                 </div>
