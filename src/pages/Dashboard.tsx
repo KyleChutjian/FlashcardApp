@@ -1,9 +1,10 @@
-import React, {useState, useEffect, MouseEvent} from "react";
+import React, {useState, useEffect, ChangeEvent} from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import Modal from "../components/Modal";
 import { getCollectionsByUserId, createCollection, updateCollection } from "../api";
 import { useAppSelector } from "../store/Store";
+import Collections from "../components/Collections";
 
 const Dashboard = () => {
     const userInfo = useAppSelector(state=> state.user.userInfo);
@@ -21,11 +22,33 @@ const Dashboard = () => {
     }, [])
 
     useEffect(() => {
-        // console.log(collections);
+        console.log(collections);
     }, [collections])
 
+    const onChangeCollectionName = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setNewCollectionName(value);
+    }
+
     const handleCreateCollection = () => {
-        console.log(newCollectionName);
+        if (newCollectionName === "" || !newCollectionName) {
+            console.log("TOAST: Collection Name cannot be empty")
+        } else {
+            console.log(`Creating a new collection called: ${newCollectionName}`);
+            setIsModalOpen(false);
+            setNewCollectionName("");
+            createCollection({
+                user_id: userInfo.user_id,
+                name: newCollectionName
+            }).then((res) => {
+                if (res.status == 200) {
+                    console.log(res.data);
+                    setCollections(currentCollections => [...currentCollections, res.data]);
+                } else {
+                    console.log(`Error: could not create collection: ${newCollectionName}`);
+                }
+            });
+        }
     }
 
 
@@ -120,27 +143,31 @@ const Dashboard = () => {
             {/* Collections Grid */}
             <section className="mb-5 py-10">
                 <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>
-                <ul role="list" className="w-full max-w-md p-4 bg-gray-900 border rounded-lg shadow ml-[10%] mr-[10%] divide-y divide-gray-200">
-                    {collections ? 
-                        // Collections Map:
-                        collections.map((value, key) => {
-                            return <li className="py-4" key={key}>
-                                <div className="flex items-center">
-                                    <div className="flex-1 min-w-0 ms-4">
-                                        <p className="text-sm font-medium text-white truncate">{value.name}</p>
-                                        <p className="text-sm text-white truncate">Flashcards: 0</p>
-                                    </div>
-                                    <div className="inline-flex items-center text-base font-semibold text-white">
-                                        Box
-                                    </div>
-                                </div>
-                            </li>
-                        })
-                    : <div></div>
-                    }
-                {/* </div> */}
-                </ul>
 
+                <Collections collections={collections}/>
+                {/* <div className="flex items-center bg-gray-200 h-min-full w-full">
+                    <ul role="list" className="w-full p-4 bg-gray-900 border rounded-lg shadow ml-[10%] mr-[10%] divide-y divide-gray-200">
+                        {collections ? 
+                            // Collections Map:
+                            
+                            collections.map((value, key) => {
+                                return <li className="py-4" key={key}>
+                                    
+                                        <div className="flex-1 ms-4">
+                                            <p className="text-sm font-medium text-white truncate">{value.name}</p>
+                                            <p className="text-sm text-white truncate">Flashcards: 0</p>
+                                        </div>
+                                        <div className="inline-flex items-center text-base font-semibold text-white">
+                                            Box
+                                        </div>
+                                    
+                                </li>
+                            })
+                            
+                        : <div></div>
+                        }
+                    </ul>
+                </div> */}
 
             </section>
 
@@ -154,7 +181,20 @@ const Dashboard = () => {
             
             {/* Create New Collection Modal */}
             <Modal isOpen={isModalOpen} onClose={onCloseModal}>
-                <button onClick={handleCreateCollection}>Create Collection</button>
+                <div className="">
+                    {/* Collection Name */}
+                    <h1 className="block mb-3 text-lg">Create New Collection:</h1>
+                    {/* <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Collection Name</label> */}
+                    <input type="text" id="first_name" onChange={onChangeCollectionName} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Collection Name" required/>
+
+                    {/* Create Collection Button */}
+                    <div className="flex justify-center align-center1 mt-3">
+                        <button onClick={handleCreateCollection} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
+                    </div>
+                    
+                    
+                </div>
+                
             </Modal>
         </div>
     )
