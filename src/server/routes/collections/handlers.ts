@@ -61,7 +61,7 @@ export async function createCollection(req: Request, res: Response): Promise<Res
             return res.status(500).send({message: 'Collection could not be created'});
         }
 
-        return res.send(results);
+        return res.send(results[0]);
     } catch (e) {
         console.log(e);
         return res.status(500).send({message: 'Error encountered'});
@@ -103,7 +103,10 @@ export async function deleteCollection(req: Request, res: Response): Promise<Res
         const deletedCollections = await db
             .delete(collections)
             .where(eq(collections.collection_id, collection_id))
-            .returning({collection_id: collections.collection_id});
+            .returning({
+                collection_id: collections.collection_id, 
+                name: collections.name
+            });
 
         if (!deletedCollections || deletedCollections.length < 1) {
             return res.status(404).send({message: 'Collection could not be deleted'});

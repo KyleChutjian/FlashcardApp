@@ -1,16 +1,21 @@
 import React, {useState, useEffect, ChangeEvent} from "react";
-import { useNavigate } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import Modal from "../components/Modal";
-import { getCollectionsByUserId, createCollection, updateCollection } from "../api";
+import { getCollectionsByUserId, createCollection } from "../api";
 import { useAppSelector } from "../store/Store";
 import Collections from "../components/Collections";
 
 const Dashboard = () => {
     const userInfo = useAppSelector(state=> state.user.userInfo);
-    const selectedCollections = useAppSelector(state => state.collections.collections);
+    // const selectedCollections = useAppSelector(state => state.collections.collections);
 
-    const [ collections, setCollections ] = useState(selectedCollections);
+    type Collection = {
+        collection_id: string,
+        user_id: string,
+        name: string,
+    }
+
+    const [ collections, setCollections ] = useState<Array<Collection> | null>(null);
     const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false);
     const [ newCollectionName, setNewCollectionName ] = useState<string>("");
 
@@ -18,11 +23,12 @@ const Dashboard = () => {
         // Get collections by UserId when page loads
         getCollectionsByUserId(userInfo.user_id).then((res) => {
             setCollections(res.data);
-        });
+            console.log(res.data);
+        })
     }, [])
 
     useEffect(() => {
-        console.log(collections);
+        // console.log(collections);
     }, [collections])
 
     const onChangeCollectionName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +49,13 @@ const Dashboard = () => {
             }).then((res) => {
                 if (res.status == 200) {
                     console.log(res.data);
-                    setCollections(currentCollections => [...currentCollections, res.data]);
+                    setCollections(currentCollections => {
+                        if (currentCollections) {
+                            return [...currentCollections, res.data];
+                        } else {
+                            return [res.data];
+                        }
+                    });
                 } else {
                     console.log(`Error: could not create collection: ${newCollectionName}`);
                 }
@@ -141,34 +153,9 @@ const Dashboard = () => {
             </section>
 
             {/* Collections Grid */}
-            <section className="mb-5 py-10">
+            <section className="mb-5 pt-10">
                 <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>
-
-                <Collections collections={collections}/>
-                {/* <div className="flex items-center bg-gray-200 h-min-full w-full">
-                    <ul role="list" className="w-full p-4 bg-gray-900 border rounded-lg shadow ml-[10%] mr-[10%] divide-y divide-gray-200">
-                        {collections ? 
-                            // Collections Map:
-                            
-                            collections.map((value, key) => {
-                                return <li className="py-4" key={key}>
-                                    
-                                        <div className="flex-1 ms-4">
-                                            <p className="text-sm font-medium text-white truncate">{value.name}</p>
-                                            <p className="text-sm text-white truncate">Flashcards: 0</p>
-                                        </div>
-                                        <div className="inline-flex items-center text-base font-semibold text-white">
-                                            Box
-                                        </div>
-                                    
-                                </li>
-                            })
-                            
-                        : <div></div>
-                        }
-                    </ul>
-                </div> */}
-
+                <Collections collectionsInput={collections}/>
             </section>
 
             {/* Create New Collection */}
