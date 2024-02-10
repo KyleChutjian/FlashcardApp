@@ -1,5 +1,5 @@
-import React, { ChangeEvent, MouseEventHandler, useEffect, useRef, useState } from "react";
-import { createCollection, updateCollection, deleteCollection } from "../api";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import { createCollection, updateCollection, deleteCollection, getCollectionsByUserId } from "../api";
 import ConfirmationModal from "./ConfirmationModal";
 import CreateCollectionModal from "./CreateCollectionModal";
 import { useAppSelector } from "../store/Store";
@@ -14,14 +14,17 @@ type CollectionsProps = {
   collectionsInput: Array<Collection> | null;
 }
 
-const Collections: React.FC<CollectionsProps> = ({collectionsInput}) => {
+const Collections = () => {
   const userInfo = useAppSelector(state=> state.user.userInfo);
 
-  const [ collections, setCollections ] = useState<Array<Collection> | null>(collectionsInput);
+  const [ collections, setCollections ] = useState<Array<Collection> | null>(null);
   
   useEffect(() => {
-    setCollections(collectionsInput);
-  }, [collectionsInput]);
+    getCollectionsByUserId(userInfo.user_id).then((res) => {
+      setCollections(res.data);
+      console.log(res.data);
+  });
+  }, []);
 
   // TODO:
   const handleCollectionView = (collection_id: string)  => {
@@ -124,6 +127,7 @@ const Collections: React.FC<CollectionsProps> = ({collectionsInput}) => {
   // Open Create Collection Modal
   const onOpenModal = () => {
     setIsCreateCollectionOpen(true);
+    setNewCollectionName("");
   }
 
   // Close Create Collection Modal
@@ -193,7 +197,7 @@ const Collections: React.FC<CollectionsProps> = ({collectionsInput}) => {
               {/* Collection Name */}
               <h1 className="block mb-3 text-lg">Create New Collection:</h1>
               {/* <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Collection Name</label> */}
-              <input type="text" id="first_name" onChange={onChangeCollectionName} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Collection Name" required/>
+              <input type="text" id="first_name" value={newCollectionName} onChange={onChangeCollectionName} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Collection Name" required/>
 
               {/* Create Collection Button */}
               <div className="flex justify-center align-center1 mt-3">
