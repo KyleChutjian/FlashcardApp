@@ -47,15 +47,15 @@ const Collections: React.FC<CollectionsProps> = ({collectionsInput}) => {
     deleteCollection(collectionToDelete).then((res) => {
       if (res.status == 200) {
         console.log(res);
-        // setCollections()
+        setCollections(currentCollections => {
+          if (currentCollections) {
+            return currentCollections.filter(collection => collection.collection_id !== collectionToDelete)
+          } else return null
+        })
         console.log(`TOAST: Successfully deleted ${res.data.name}`)
         setIsConfirmationModalOpen(false);
       }
-      
-    })
-    // After deletion, close the modal
-    
-
+    });
   };
 
   const handleCancelDelete = () => {

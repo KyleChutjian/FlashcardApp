@@ -24,7 +24,7 @@ const Dashboard = () => {
         getCollectionsByUserId(userInfo.user_id).then((res) => {
             setCollections(res.data);
             console.log(res.data);
-        })
+        });
     }, [])
 
     useEffect(() => {
