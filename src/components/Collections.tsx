@@ -87,9 +87,9 @@ const Collections: React.FC<CollectionsProps> = ({collectionsInput}) => {
       <div className="grid grid-cols-3 gap-4 w-full">
         {collections && collections.map((collection, key) => {
           // console.log(collection);
-            return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex">
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold">{collection.name}</h2>
+            return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
+                <div className="flex-1 max-w-[80%]">
+                  <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
                   <p className="text-gray-600">Flashcards: 0</p>
                 </div>
 
