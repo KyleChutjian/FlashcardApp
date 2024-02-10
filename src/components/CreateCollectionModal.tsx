@@ -6,7 +6,7 @@ type propTypes = {
     children: React.ReactNode;
 }
 
-const Modal: React.FC<propTypes> = ({isOpen, onClose, children}) => {
+const CreateCollectionModal: React.FC<propTypes> = ({isOpen, onClose, children}) => {
 
     return (
         <div onClick={onClose} className={`p-4 min-w-10 max-h-full fixed inset-0 flex justify-center items-center transition-colors ${isOpen ? "visible bg-black/20" : "invisible"} `}>
@@ -20,4 +20,4 @@ const Modal: React.FC<propTypes> = ({isOpen, onClose, children}) => {
         </div>
     )
 }
-export default Modal;
+export default CreateCollectionModal;
