@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-import { getFlashcardsByCollectionId } from "../api";
+import { createFlashcard, getFlashcardsByCollectionId } from "../api";
 
 const Flashcards = () => {
     type Flashcard = {
@@ -9,6 +9,7 @@ const Flashcards = () => {
         english: string;
         romaji: string;
         kana: string;
+        createdAt: string;
     }
 
 
@@ -22,6 +23,32 @@ const Flashcards = () => {
         });
     }, [])
     
+    const handleCreateFlashcard = () => {
+        console.log("Creating new flashcard");
+        const emptyFlashcard = {
+            english: "",
+            romaji: "",
+            kana: "",
+        }
+        createFlashcard({
+            collection_id: collection_id,
+            english: "",
+            romaji: "",
+            kana: ""
+        }).then((res) => {
+            if (res.status === 200) {
+                console.log(res.data);
+                setFlashcards(currentFlashcards => {
+                    if (currentFlashcards) {
+                        return [...currentFlashcards, res.data];
+                    } else {
+                        return [res.data];
+                    }
+                });
+            }
+        });
+    }
+
   return (
     <section className="mb-5 pt-5">
         <div className="text-gray-900 bg-gray-200 w-[90%] justify-center align-center mx-auto">
@@ -39,13 +66,10 @@ const Flashcards = () => {
                         </tr>
                         
                         {/* Flashcard Grid */}
-                        {flashcards && flashcards.length>0 ? 
-                        
-                        
-                        flashcards.map((flashcard, key) => {
+                        {flashcards && flashcards.map((flashcard, key) => {
                             return <tr key={key} className="border-b hover:bg-orange-100 bg-gray-100">
                                 <td className="p-3 px-5 w-[15%] border-r">
-                                    <p className="bg-transparent border-b-2 border-gray-300 py-2">{key+1}</p>
+                                    <p className="bg-transparent border-gray-300 py-2">{key+1}</p>
                                 </td>
                                 <td className="p-3 px-5 w-[20%] border-r">
                                     <input type="text" value={flashcard.english} className="bg-transparent border-b-2 border-gray-300 py-2"/>
@@ -66,11 +90,10 @@ const Flashcards = () => {
                                     </div>
                                 </td>
                             </tr>
-                        }) : (
-                            <tr>
-                                <td colSpan={5} className="p-3 px-2 text-center">This collection has no flashcards</td>
-                            </tr>
-                        )}
+                        })}
+                        <tr>
+                            <td colSpan={5} className="p-3 px-2 text-center"><button onClick={(e) => handleCreateFlashcard()} className="text-white text-1xl bg-gray-900 font-semibold py-2 px-4 rounded w-[20%] mx-auto">Add Flashcard</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

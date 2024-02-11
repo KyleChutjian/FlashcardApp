@@ -92,7 +92,7 @@ export async function createFlashcard(req: Request, res: Response): Promise<Resp
             return res.status(500).send({message: 'Flashcard could not be created'});
         }
 
-        return res.send(results);
+        return res.send(results[0]);
     } catch (e) {
         console.log(e);
         return res.status(500).send({message: 'Error encountered'});
