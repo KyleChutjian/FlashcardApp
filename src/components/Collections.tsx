@@ -3,6 +3,7 @@ import { createCollection, updateCollection, deleteCollection, getCollectionsByU
 import ConfirmationModal from "./ConfirmationModal";
 import CreateCollectionModal from "./CreateCollectionModal";
 import { useAppSelector } from "../store/Store";
+import { useNavigate } from "react-router-dom";
 
 type Collection = {
     collection_id: string,
@@ -16,7 +17,8 @@ type CollectionsProps = {
 
 const Collections = () => {
   const userInfo = useAppSelector(state=> state.user.userInfo);
-
+  const router = useNavigate();
+  
   const [ collections, setCollections ] = useState<Array<Collection> | null>(null);
   
   useEffect(() => {
@@ -29,11 +31,13 @@ const Collections = () => {
   // TODO:
   const handleCollectionView = (collection_id: string)  => {
     console.log(`clicked on view collection for id: ${collection_id}`);
+    router(`/collection/view/${collection_id}`);
   }
 
   // TODO:
   const handleCollectionEdit = (collection_id: string)  => {
     console.log(`clicked on edit collection for id: ${collection_id}`);
+    router(`/collection/edit/${collection_id}`);
   }
 
   const handleCollectionDelete = (collection_id: string)  => {
@@ -162,9 +166,9 @@ const Collections = () => {
                     {openMenuId === collection.collection_id && (
                       <div ref={menuRef} className="absolute bottom-full right-0 mt-2 w-24 bg-white rounded-lg shadow-lg z-10">
                         <ul>
-                          <li><button onClick={(e) => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
-                          <li><button onClick={(e) => handleCollectionEdit(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Edit</button></li>
-                          <li><button onClick={(e) => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
+                          <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
+                          <li><button onClick={() => handleCollectionEdit(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Edit</button></li>
+                          <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
                         </ul>
                       </div>
                     )}

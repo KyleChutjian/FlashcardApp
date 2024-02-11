@@ -12,6 +12,8 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { store, persistor } from './store/Store';
 import { PersistGate } from 'redux-persist/integration/react';
+import EditCollection from './pages/EditCollection';
+import ViewCollection from './pages/ViewCollection';
 
 function App() {
 
@@ -27,6 +29,8 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="signUp" element={<SignUp />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="edit" element={<Dashboard />} />
+              <Route path="collection/:mode/:collection_id" element={<ViewCollection />} />
             </Routes>
           </BrowserRouter>
         </PersistGate>

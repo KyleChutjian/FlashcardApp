@@ -15,7 +15,7 @@ export function signup(data: Object) {
     return http.post(`${userEndPoint}`, data)
 }
 
-// Users:
+//// Users:
 
 // Get User By Id
 export function getUserById(user_id: String) {
@@ -28,8 +28,8 @@ export function getAllUsers() {
 }
 
 // Update User By Id
-export function updateUser(user_id: String) {
-    return http.patch(`${userEndPoint}/${user_id}`);
+export function updateUser(user_id: String, data: Object) {
+    return http.patch(`${userEndPoint}/${user_id}`, data);
 }
 
 // Delete User By Id
@@ -38,7 +38,7 @@ export function deleteUser(user_id: String) {
 }
 
 
-// Collections:
+//// Collections:
 
 
 // Get Collection By Id
@@ -62,8 +62,8 @@ export function createCollection(data: Object) {
 }
 
 // Update Collection By Id
-export function updateCollection(collection_id: String) {
-    return http.patch(`${collectionEndPoint}/${collection_id}`);
+export function updateCollection(collection_id: String, data: Object) {
+    return http.patch(`${collectionEndPoint}/${collection_id}`, data);
 }
 
 // Delete Collection By Id
@@ -71,10 +71,39 @@ export function deleteCollection(collection_id: String) {
     return http.delete(`${collectionEndPoint}/${collection_id}`);
 }
 
+//// Flashcards:
 
+// Get Flashcard By Id
+export function getFlashcardById(flashcard_id: String) {
+    return http.get(`${flashcardEndPoint}/${flashcard_id}`);
+}
 
+// Get All Flashcards
+export function getAllFlashcards() {
+    return http.get(`${flashcardEndPoint}`);
+}
 
+// Get Flashcard By UserId
+export function getFlashcardsByUserId(user_id: String) {
+    return http.get(`${flashcardEndPoint}/user/${user_id}`);
+}
 
+// Get Flashcard By CollectionId
+export function getFlashcardsByCollectionId(collection_id: String) {
+    return http.get(`${flashcardEndPoint}/collection/${collection_id}`);
+}
 
+// Create Flashcard: [collection_id, english, romaji, kana]
+export function createFlashcard(data: Object) {
+    return http.post(`${flashcardEndPoint}`, data);
+}
 
-// Flashcards:
+// Update Flashcard By Id
+export function updateFlashcard(flashcard_id: String, data: Object) {
+    return http.patch(`${flashcardEndPoint}/${flashcard_id}`, data);
+}
+
+// Delete Flashcard By Id
+export function deleteFlashcard(flashcard_id: String) {
+    return http.delete(`${flashcardEndPoint}/${flashcard_id}`);
+}
