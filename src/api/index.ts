@@ -99,8 +99,8 @@ export function createFlashcard(data: Object) {
 }
 
 // Update Flashcard By Id
-export function updateFlashcard(flashcard_id: String, data: Object) {
-    return http.patch(`${flashcardEndPoint}/${flashcard_id}`, data);
+export function updateFlashcard(data: Object) {
+    return http.patch(`${flashcardEndPoint}`, data);
 }
 
 // Delete Flashcard By Id

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-import { createFlashcard, getFlashcardsByCollectionId } from "../api";
+import { createFlashcard, getFlashcardsByCollectionId, updateFlashcard, deleteFlashcard } from "../api";
+import ConfirmationModal from "./ConfirmationModal";
 
 const Flashcards = () => {
     type Flashcard = {
@@ -48,7 +49,6 @@ const Flashcards = () => {
     }
 
     const handleFlashcardOnChange = (flashcard_id: string, column: string, value: string) => {
-        console.log(`Changing column ${column} to ${value} for flashcard_id: ${flashcard_id}`);
         setFlashcards(currentFlashcards => {
             if (currentFlashcards) {
                 return currentFlashcards.map(flashcard => {
@@ -65,23 +65,49 @@ const Flashcards = () => {
             }
         });
     }
-    const handleSaveFlashcard = (flashcard_id: string) => {
-        console.log(`Saving flashcard with id ${flashcard_id}`);
+
+    const handleSaveFlashcard = (flashcard: Flashcard) => {
+        console.log(`Saving flashcard with id ${flashcard.flashcard_id}`);
         
-        if (flashcards) flashcards.map(flashcard => {
-            if (flashcard.flashcard_id === flashcard_id) {
-                console.log(flashcard);
+        updateFlashcard(flashcard).then((res) => {
+            if (res.status === 200) {
+                console.log("Flashcard successfully updated");
+                console.log(res.data)
+                // update flashcard?
             }
-        })
+            
+        });
+    };
+
+    const [isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(false);
+    const [flashcardToDelete, setFlashcardToDelete ] = useState("");
+
+    const handleFlashcardDelete = (flashcard_id: string) => {
+        console.log(`clicked on delete flashcard for id: ${flashcard_id}`);
+        setFlashcardToDelete(flashcard_id);
+        setIsConfirmationModalOpen(true);
     }
-    const handleDeleteFlashcard = (flashcard_id: string) => {
-        console.log(`Deleting flashcard with id ${flashcard_id}`);
-        if (flashcards) flashcards.map(flashcard => {
-            if (flashcard.flashcard_id === flashcard_id) {
-                console.log(flashcard);
+
+    const handleConfirmDeleteFlashcard = () => {
+        console.log(`Deleting flashcard with id ${flashcardToDelete}`);
+        
+        deleteFlashcard(flashcardToDelete).then((res) => {
+            if (res.status === 200) {
+                console.log(`Deleted flashcard with id ${res.data.flashcard_id}`);
+                setFlashcards(currentFlashcards => {
+                    if (currentFlashcards) {
+                        return currentFlashcards.filter(flashcard => flashcard.flashcard_id !== flashcardToDelete);
+                    } else return null
+                });
+                console.log(`TOAST: Successfully deleted ${res.data.name}`)
+                setIsConfirmationModalOpen(false);
             }
-        })
+        });
     }
+    const handleCancelDelete = () => {
+        // If the user cancels deletion, close the modal
+        setIsConfirmationModalOpen(false);
+      };
 
   return (
     <section className="mb-5 pt-5">
@@ -118,11 +144,11 @@ const Flashcards = () => {
                                     <div className="justify-center align-center mx-auto w-[19%] flex">
                                         <button 
                                             type="button"
-                                            onClick={() => handleSaveFlashcard(flashcard.flashcard_id)}
+                                            onClick={() => handleSaveFlashcard(flashcard)}
                                             className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Save</button>
                                         <button
                                             type="button"
-                                            onClick={() => handleDeleteFlashcard(flashcard.flashcard_id)}
+                                            onClick={() => handleFlashcardDelete(flashcard.flashcard_id)}
                                             className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
                                     </div>
                                 </td>
@@ -136,9 +162,13 @@ const Flashcards = () => {
             </div>
         </div>
         
-        {/* Save Changes */}
-
-
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          message="Are you sure you want to delete this collection?"
+          onConfirm={handleConfirmDeleteFlashcard}
+          onCancel={handleCancelDelete}
+        />
+        
     </section>
 
 

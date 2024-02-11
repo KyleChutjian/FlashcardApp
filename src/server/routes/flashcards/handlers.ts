@@ -101,8 +101,7 @@ export async function createFlashcard(req: Request, res: Response): Promise<Resp
 
 export async function updateFlashcard(req: Request, res: Response): Promise<Response> {
     try {
-        const flashcard_id = req.params.flashcard_id;
-        const { english, romaji, kana } = req.body;
+        const { flashcard_id, english, romaji, kana } = req.body;
         const updatedFlashcards: NewFlashcard[] = await db
             .update(flashcards)
             .set({english, romaji, kana})

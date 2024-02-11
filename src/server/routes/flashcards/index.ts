@@ -17,6 +17,6 @@ router.get('/', getFlashcards);
 router.get('/user/:user_id', getFlashcardsByUserId);
 router.get('/collection/:collection_id', getFlashcardsByCollectionId);
 router.post('/', createFlashcard);
-router.patch('/:flashcard_id', updateFlashcard);
+router.patch('/', updateFlashcard);
 router.delete('/:flashcard_id', deleteFlashcard);
 router.delete('/collection/:collection_id', deleteFlashcardsByCollectionId);
