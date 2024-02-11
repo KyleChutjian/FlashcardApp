@@ -16,20 +16,18 @@ const Flashcards = () => {
     const { mode, collection_id} = useParams();
 
     const [ flashcards, setFlashcards ] = useState<Array<Flashcard> | null>(null);
+    // const [ flashcardArray, setFlashcardArray ] = useState<Array<Flashcard> | null>(null);
+
 
     useEffect(() => {
         if (collection_id) getFlashcardsByCollectionId(collection_id).then((res) => {
             setFlashcards(res.data);
+            // setFlashcardArray(res.data);
         });
     }, [])
     
     const handleCreateFlashcard = () => {
         console.log("Creating new flashcard");
-        const emptyFlashcard = {
-            english: "",
-            romaji: "",
-            kana: "",
-        }
         createFlashcard({
             collection_id: collection_id,
             english: "",
@@ -47,6 +45,42 @@ const Flashcards = () => {
                 });
             }
         });
+    }
+
+    const handleFlashcardOnChange = (flashcard_id: string, column: string, value: string) => {
+        console.log(`Changing column ${column} to ${value} for flashcard_id: ${flashcard_id}`);
+        setFlashcards(currentFlashcards => {
+            if (currentFlashcards) {
+                return currentFlashcards.map(flashcard => {
+                    if (flashcard.flashcard_id === flashcard_id) {
+                        return {
+                            ...flashcard,
+                            [column]: value
+                        };
+                    }
+                    return flashcard;
+                });
+            } else {
+                return null;
+            }
+        });
+    }
+    const handleSaveFlashcard = (flashcard_id: string) => {
+        console.log(`Saving flashcard with id ${flashcard_id}`);
+        
+        if (flashcards) flashcards.map(flashcard => {
+            if (flashcard.flashcard_id === flashcard_id) {
+                console.log(flashcard);
+            }
+        })
+    }
+    const handleDeleteFlashcard = (flashcard_id: string) => {
+        console.log(`Deleting flashcard with id ${flashcard_id}`);
+        if (flashcards) flashcards.map(flashcard => {
+            if (flashcard.flashcard_id === flashcard_id) {
+                console.log(flashcard);
+            }
+        })
     }
 
   return (
@@ -72,20 +106,23 @@ const Flashcards = () => {
                                     <p className="bg-transparent border-gray-300 py-2">{key+1}</p>
                                 </td>
                                 <td className="p-3 px-5 w-[20%] border-r">
-                                    <input type="text" value={flashcard.english} className="bg-transparent border-b-2 border-gray-300 py-2"/>
+                                    <input type="text" value={flashcard.english} onChange={(e) => handleFlashcardOnChange(flashcard.flashcard_id, "english", e.target.value)} className="bg-transparent border-b-2 border-gray-300 py-2"/>
                                 </td>
                                 <td className="p-3 px-5 w-[20%] border-r">
-                                    <input type="text" value={flashcard.romaji} className="bg-transparent border-b-2 border-gray-300 py-2"/>
+                                    <input type="text" value={flashcard.romaji} onChange={(e) => handleFlashcardOnChange(flashcard.flashcard_id, "romaji", e.target.value)} className="bg-transparent border-b-2 border-gray-300 py-2"/>
                                 </td>
                                 <td className="p-3 px-5 w-[20%]  border-r">
-                                    <input type="text" value={flashcard.kana} className="bg-transparent border-b-2 border-gray-300 py-2"/>
+                                    <input type="text" value={flashcard.kana} onChange={(e) => handleFlashcardOnChange(flashcard.flashcard_id, "kana", e.target.value)} className="bg-transparent border-b-2 border-gray-300 py-2"/>
                                 </td>
                                 <td className="w-[10%]">
                                     <div className="justify-center align-center mx-auto w-[19%] flex">
-                                        <button type="button"
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleSaveFlashcard(flashcard.flashcard_id)}
                                             className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Save</button>
                                         <button
                                             type="button"
+                                            onClick={() => handleDeleteFlashcard(flashcard.flashcard_id)}
                                             className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
                                     </div>
                                 </td>
