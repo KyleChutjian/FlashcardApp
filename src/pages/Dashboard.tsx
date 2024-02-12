@@ -1,11 +1,19 @@
 import React, {useState, useEffect, ChangeEvent} from "react";
 import NavBar from "../components/Navbar";
-import Modal from "../components/CreateCollectionModal";
-import { getCollectionsByUserId, createCollection } from "../api";
 import { useAppSelector } from "../store/Store";
 import Collections from "../components/Collections";
 
 const Dashboard = () => {
+    const selectedCollections = useAppSelector(state => state.collections.collections);
+
+    const handleStartStudying = () => {
+        if (selectedCollections.length === 0) {
+            console.log("TOAST: No collections are selected");
+        } else {
+            console.log(selectedCollections);
+        }
+        
+    }
 
     return(
         <div className="bg-gray-100 min-h-screen">
@@ -18,7 +26,7 @@ const Dashboard = () => {
                 <div className="py-10 px-4 mx-auto max-w-screen-xl text-center">
                     <button 
                         className="text-gray-900 text-4xl bg-transparent font-extrabold  py-2 px-4 border border-gray-900 hover:text-white hover:bg-gray-900 hover:border-transparent rounded"
-                        // onClick={}
+                        onClick={handleStartStudying}
                     >Start Studying</button>
                 </div>
 

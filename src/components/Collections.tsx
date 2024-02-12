@@ -2,7 +2,8 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { createCollection, updateCollection, deleteCollection, getCollectionsByUserId } from "../api";
 import ConfirmationModal from "./ConfirmationModal";
 import CreateCollectionModal from "./CreateCollectionModal";
-import { useAppSelector } from "../store/Store";
+import { useAppDispatch, useAppSelector } from "../store/Store";
+import { setSelectedCollections } from "../store/slices";
 import { useNavigate } from "react-router-dom";
 
 type Collection = {
@@ -18,10 +19,11 @@ type SelectedCollection = {
 
 const Collections = () => {
   const userInfo = useAppSelector(state=> state.user.userInfo);
+  const dispatch = useAppDispatch();
   const router = useNavigate();
   
   const [ collections, setCollections ] = useState<Array<Collection> | null>(null);
-  const [ selectedCollections, setSelectedCollections ] = useState<Array<SelectedCollection> | null>(null);
+  const [ selectedCollectionsArray, setSelectedCollectionsArray ] = useState<Array<SelectedCollection> | null>(null);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState<boolean>(false);
   const [collectionToDelete, setCollectionToDelete] = useState<string>("");
   const [ isCreateCollectionOpen, setIsCreateCollectionOpen ] = useState<boolean>(false);
@@ -29,8 +31,22 @@ const Collections = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+
+  useEffect(() => {
+    const collectionIdsSelected = selectedCollectionsArray?.map(collection => {
+      if (collection.isSelected) {
+        return collection.collection_id
+      }
+    }).filter(collectionId => collectionId !== undefined) as string[];
+
+    dispatch(setSelectedCollections({
+      collections: collectionIdsSelected
+    }));
+
+  }, [selectedCollectionsArray])
+
   const onChangeCheckbox = (collection_id: string, isChecked: boolean) => {
-    setSelectedCollections(currentSelectedCollections => {
+    setSelectedCollectionsArray(currentSelectedCollections => {
       if (currentSelectedCollections) {
         return currentSelectedCollections.map(selectedCollection => {
           if (selectedCollection.collection_id === collection_id) {
@@ -49,7 +65,7 @@ const Collections = () => {
     getCollectionsByUserId(userInfo.user_id).then((res: any) => {
       setCollections(res.data);
       console.log(res.data);
-      setSelectedCollections(res.data.map((collection: Collection) => ({
+      setSelectedCollectionsArray(res.data.map((collection: Collection) => ({
         collection_id: collection.collection_id,
         isSelected: false
       })));
@@ -79,7 +95,7 @@ const Collections = () => {
           } else return null
         });
 
-        setSelectedCollections(currentCollections => {
+        setSelectedCollectionsArray(currentCollections => {
           if (currentCollections) {
             return currentCollections.filter(collection => collection.collection_id !== collectionToDelete);
           } else return null
@@ -134,7 +150,7 @@ const Collections = () => {
                           return [res.data];
                       }
                   });
-                  setSelectedCollections((selectedCollections) => {
+                  setSelectedCollectionsArray((selectedCollections) => {
                     if (selectedCollections) {
                       return [...selectedCollections, {
                         collection_id: res.data.collection_id,
@@ -196,7 +212,7 @@ const Collections = () => {
 
                     <input 
                       type="checkbox"
-                      checked={selectedCollections?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
+                      checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
                       onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
                     />
                   </div>
