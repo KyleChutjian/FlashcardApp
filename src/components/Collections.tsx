@@ -11,8 +11,9 @@ type Collection = {
     name: string,
 }
 
-type CollectionsProps = {
-  collectionsInput: Array<Collection> | null;
+type SelectedCollection = {
+  collection_id: string;
+  isSelected: boolean
 }
 
 const Collections = () => {
@@ -20,38 +21,51 @@ const Collections = () => {
   const router = useNavigate();
   
   const [ collections, setCollections ] = useState<Array<Collection> | null>(null);
-  
+  const [ selectedCollections, setSelectedCollections ] = useState<Array<SelectedCollection> | null>(null);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState<boolean>(false);
+  const [collectionToDelete, setCollectionToDelete] = useState<string>("");
+  const [ isCreateCollectionOpen, setIsCreateCollectionOpen ] = useState<boolean>(false);
+  const [ newCollectionName, setNewCollectionName ] = useState<string>("");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const onChangeCheckbox = (collection_id: string, isChecked: boolean) => {
+    setSelectedCollections(currentSelectedCollections => {
+      if (currentSelectedCollections) {
+        return currentSelectedCollections.map(selectedCollection => {
+          if (selectedCollection.collection_id === collection_id) {
+            return {
+              ...selectedCollection,
+              isSelected: isChecked
+            };
+          }
+          return selectedCollection;
+        });
+      } else return null;
+    })
+  }
+
   useEffect(() => {
-    getCollectionsByUserId(userInfo.user_id).then((res) => {
+    getCollectionsByUserId(userInfo.user_id).then((res: any) => {
       setCollections(res.data);
       console.log(res.data);
+      setSelectedCollections(res.data.map((collection: Collection) => ({
+        collection_id: collection.collection_id,
+        isSelected: false
+      })));
   });
   }, []);
 
-  // TODO:
   const handleCollectionView = (collection_id: string)  => {
     console.log(`clicked on view collection for id: ${collection_id}`);
     router(`/collection/view/${collection_id}`);
   }
-
-  // TODO:
-  const handleCollectionEdit = (collection_id: string)  => {
-    console.log(`clicked on edit collection for id: ${collection_id}`);
-    router(`/collection/edit/${collection_id}`);
-  }
-
   const handleCollectionDelete = (collection_id: string)  => {
     console.log(`clicked on delete collection for id: ${collection_id}`);
 
     setCollectionToDelete(collection_id);
     setIsConfirmationModalOpen(true);
   }
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState<boolean>(false);
-  const [collectionToDelete, setCollectionToDelete] = useState<string>("");
-
-  // ConfirmationModal UseStates/Functions:
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const handleConfirmDelete = () => {
     // Implement delete functionality here using the `collectionToDelete` state
     console.log("Confirming deletion of collection ID:", collectionToDelete);
@@ -61,7 +75,13 @@ const Collections = () => {
         console.log(res);
         setCollections(currentCollections => {
           if (currentCollections) {
-            return currentCollections.filter(collection => collection.collection_id !== collectionToDelete)
+            return currentCollections.filter(collection => collection.collection_id !== collectionToDelete);
+          } else return null
+        });
+
+        setSelectedCollections(currentCollections => {
+          if (currentCollections) {
+            return currentCollections.filter(collection => collection.collection_id !== collectionToDelete);
           } else return null
         })
         console.log(`TOAST: Successfully deleted ${res.data.name}`)
@@ -69,12 +89,10 @@ const Collections = () => {
       }
     });
   };
-
   const handleCancelDelete = () => {
     // If the user cancels deletion, close the modal
     setIsConfirmationModalOpen(false);
   };
-
   const toggleOptionsMenu = (collectionId: string) => {
     setOpenMenuId(prevOpenMenuId => (prevOpenMenuId === collectionId ? null : collectionId));
   }
@@ -92,15 +110,10 @@ const Collections = () => {
     }
   }, []);
 
-  // CreateCollectionModal useStates/Functions:
-  const [ isCreateCollectionOpen, setIsCreateCollectionOpen ] = useState<boolean>(false);
-  const [ newCollectionName, setNewCollectionName ] = useState<string>("");
-
   const onChangeCollectionName = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNewCollectionName(value);
   }
-
   const handleCreateCollection = () => {
       if (newCollectionName === "" || !newCollectionName) {
           console.log("TOAST: Collection Name cannot be empty")
@@ -121,25 +134,35 @@ const Collections = () => {
                           return [res.data];
                       }
                   });
+                  setSelectedCollections((selectedCollections) => {
+                    if (selectedCollections) {
+                      return [...selectedCollections, {
+                        collection_id: res.data.collection_id,
+                        isSelected: false
+                      }]
+                    } else {
+                      return [{
+                        collection_id: res.data.collection_id,
+                        isSelected: false
+                      }]
+                    }
+                  })
+
               } else {
                   console.log(`Error: could not create collection: ${newCollectionName}`);
               }
           });
       }
   }
-
   // Open Create Collection Modal
-  const onOpenModal = () => {
+  const onOpenCreateCollection = () => {
     setIsCreateCollectionOpen(true);
     setNewCollectionName("");
   }
-
   // Close Create Collection Modal
   const onCloseCreateCollection = () => {
     setIsCreateCollectionOpen(false);
   }
-
-
 
   return (
     <section className="mb-5 pt-10">
@@ -159,7 +182,6 @@ const Collections = () => {
                   <div className="flex-1 flex justify-end items-center relative">
                     {/* 3 dots button goes here with options: [View, Edit, Delete] */}
                     <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
-                      {/* <img src="../../public/MoreOptions2.png" alt="Options" className="h-6 w-6" /> */}
                       <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
                     </button>
                     {/* Options Menu */}
@@ -167,11 +189,16 @@ const Collections = () => {
                       <div ref={menuRef} className="absolute bottom-full right-0 mt-2 w-24 bg-white rounded-lg shadow-lg z-10">
                         <ul>
                           <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
-                          <li><button onClick={() => handleCollectionEdit(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Edit</button></li>
                           <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
                         </ul>
                       </div>
                     )}
+
+                    <input 
+                      type="checkbox"
+                      checked={selectedCollections?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
+                      onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
+                    />
                   </div>
 
 
@@ -191,7 +218,7 @@ const Collections = () => {
       <div className="py-10 px-4 mx-auto max-w-screen-xl text-center">
           <button 
                   className="hover:text-gray-900 text-2xl bg-gray-900 font-extrabold  py-2 px-4 border text-white hover:bg-gray-100 border-gray-900 rounded"
-                  onClick={onOpenModal}
+                  onClick={onOpenCreateCollection}
           >Create New Collection</button>
       </div>
       

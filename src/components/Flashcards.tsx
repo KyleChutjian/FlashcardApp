@@ -107,7 +107,7 @@ const Flashcards = () => {
     const handleCancelDelete = () => {
         // If the user cancels deletion, close the modal
         setIsConfirmationModalOpen(false);
-      };
+    };
 
   return (
     <section className="mb-5 pt-5">

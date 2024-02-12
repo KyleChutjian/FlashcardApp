@@ -1,15 +1,16 @@
-// import {logoutUser} from "../services/authService";
-
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
-  const handleToDashboard = () => {
-    console.log("to dashboard")
-  }
+  const router = useNavigate();
 
+  const handleToDashboard = () => {
+    router("/dashboard");
+  }
 
   const handleLogout = () => {
     // logoutUser();
+    router("/login");
   }
 
 
