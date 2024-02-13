@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './store/Store';
 import { PersistGate } from 'redux-persist/integration/react';
 import ViewCollection from './pages/ViewCollection';
+import Study from './pages/Study';
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="signUp" element={<SignUp />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="collection/view/:collection_id" element={<ViewCollection />} />
+              <Route path="study" element={<Study />} />
             </Routes>
           </BrowserRouter>
         </PersistGate>

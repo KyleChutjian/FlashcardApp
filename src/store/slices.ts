@@ -6,18 +6,31 @@ const initialUserState = {
         name: ""
     },
 };
-
-interface CollectionState {
-    collections: string[];
+type CollectionSlice = {
+    collections: Array<string>;
+    frontFlashcard: string;
+    backFlashcard: string;
 };
 
-const initialCollectionsState: CollectionState = {
-    collections: []
-};
-
-type CollectionArray = {
+type SelectedCollectionSlice = {
     collections: Array<string>;
 };
+
+type SelectedFrontFlashcardSlice = {
+    frontFlashcard: string;
+};
+
+type SelectedBackFlashcardSlice = {
+    backFlashcard: string;
+};
+
+const initialCollections: CollectionSlice = {
+    collections: [],
+    frontFlashcard: "",
+    backFlashcard: ""
+};
+
+
 
 export const userSlice = createSlice({
     name: "user",
@@ -32,14 +45,20 @@ export const userSlice = createSlice({
 
 export const collectionsSlice = createSlice({
     name: "collections",
-    initialState: initialCollectionsState,
+    initialState: initialCollections,
     reducers: {
-        setSelectedCollections: (state, action: PayloadAction<CollectionArray>) => {
+        setSelectedCollections: (state, action: PayloadAction<SelectedCollectionSlice>) => {
             state.collections = action.payload.collections
-        }
+        },
+        setFrontFlashcard: (state, action: PayloadAction<SelectedFrontFlashcardSlice>) => {
+            state.frontFlashcard = action.payload.frontFlashcard
+        },
+        setBackFlashcard: (state, action: PayloadAction<SelectedBackFlashcardSlice>) => {
+            state.backFlashcard = action.payload.backFlashcard
+        },
     }
 });
 
 export default userSlice.reducer;
 export const { setLoginData } = userSlice.actions;
-export const { setSelectedCollections } = collectionsSlice.actions;
+export const { setSelectedCollections, setFrontFlashcard, setBackFlashcard } = collectionsSlice.actions;
