@@ -33,6 +33,25 @@ export async function getFlashcards(req: Request, res: Response): Promise<Respon
     }
 }
 
+export async function getFlashcardsByCollectionIds(req: Request, res: Response): Promise<Response> {
+    try {
+        const collectionIds = req.body.collectionIds;
+
+        const allFlashcards: Flashcard[] = await db.query.flashcards.findMany({
+            where: inArray(flashcards.collection_id, collectionIds)
+        });
+
+        if (!allFlashcards || allFlashcards.length < 0) {
+            return res.status(404).send({message: 'Error encountered'});
+        }
+
+        return res.send(allFlashcards);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send({message: 'Error encountered'});
+    }
+}
+
 export async function getFlashcardsByCollectionId(req: Request, res: Response): Promise<Response> {
     try {
         const collection_id = req.params.collection_id;

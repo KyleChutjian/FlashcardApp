@@ -95,7 +95,7 @@ export function getFlashcardsByCollectionId(collection_id: String) {
 
 // Get Flashcards By CollectionIds
 export function getFlashcardsByCollectionIds(data: Object) {
-    return http.get(`${flashcardEndPoint}/collections`, data);
+    return http.post(`${flashcardEndPoint}/collections`, data);
 }
 
 // Create Flashcard: [collection_id, english, romaji, kana]
