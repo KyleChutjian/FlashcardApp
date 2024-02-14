@@ -1,23 +1,17 @@
 import React, { ChangeEvent, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api";
-import { useContext } from "react";
 import { useAppDispatch } from "../store/Store";
 import { setLoginData } from "../store/slices";
 
-
 const Login = () => {
-    // const {handleLogin} = useContext(Context);
     const dispatch = useAppDispatch();
-
-
     const router = useNavigate();
 
     const [ loginInfo, setLoginInfo ] = useState({
         email: null,
         password: null
     });
-
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setLoginInfo((prev) => ({
@@ -27,12 +21,8 @@ const Login = () => {
     }
 
     const handleLoginSubmit = () => {
-
-
-
         login(loginInfo).then((res) => {
             if (res.status === 200) {
-
                 console.log(`user_id: ${res.data.user_id}`);
                 console.log(`name: ${res.data.name}`);
 
@@ -40,9 +30,6 @@ const Login = () => {
                     user_id: res.data.user_id,
                     name: res.data.name
                 }));
-
-
-
                 router("/dashboard");
             } else {
                 throw console.error("Invalid Response");
@@ -50,13 +37,11 @@ const Login = () => {
         }).catch((e) => {
             console.log("Invalid User")
         });
-        
     }
 
     const handleSignup = () => {
         router("/signup");
     }
-
 
     return(
         <div>
@@ -99,9 +84,7 @@ const Login = () => {
                     {/* Login Button */}
                     <button onClick={handleLoginSubmit} className="w-[40%] t-5 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</button>
                     
-                    
                 </div>
-
 
                 {/* Sign Up Button */}
                 <div className="max-w-md mx-auto mt-3 flex flex-col items-center">
@@ -109,11 +92,7 @@ const Login = () => {
                 </div>
             </section>
             
-
-
-
         </div>
-
     )
 }
 

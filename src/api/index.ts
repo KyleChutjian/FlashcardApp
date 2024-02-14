@@ -88,9 +88,14 @@ export function getFlashcardsByUserId(user_id: String) {
     return http.get(`${flashcardEndPoint}/user/${user_id}`);
 }
 
-// Get Flashcard By CollectionId
+// Get Flashcards By CollectionId
 export function getFlashcardsByCollectionId(collection_id: String) {
     return http.get(`${flashcardEndPoint}/collection/${collection_id}`);
+}
+
+// Get Flashcards By CollectionIds
+export function getFlashcardsByCollectionIds(data: Object) {
+    return http.get(`${flashcardEndPoint}/collections`, data);
 }
 
 // Create Flashcard: [collection_id, english, romaji, kana]
