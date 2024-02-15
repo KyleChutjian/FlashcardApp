@@ -23,6 +23,25 @@ export async function getCollectionById(req: Request, res: Response): Promise<Re
     }
 }
 
+export async function getCollectionNameById(req: Request, res: Response): Promise<Response> {
+    try {
+        const collection_id = req.params.collection_id;
+
+        const user = await db.query.collections.findFirst({
+            where: eq(collections.collection_id, collection_id)
+        });
+
+        if (!user) {
+            return res.status(404).send({message: 'Collection not found'});
+        }
+        return res.send(user.name);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send({message: 'Error encountered'});
+    }
+}
+
 export async function getCollections(req: Request, res: Response): Promise<Response> {
     try {
         const allCollections: Collection[] = await db.query.collections.findMany();

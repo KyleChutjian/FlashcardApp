@@ -46,6 +46,11 @@ export function getCollectionById(collection_id: String) {
     return http.get(`${collectionEndPoint}/${collection_id}`);
 }
 
+// Get Collection Name By Id
+export function getCollectionNameById(collection_id: String) {
+    return http.get(`${collectionEndPoint}/name/${collection_id}`);
+}
+
 // Get All Collections
 export function getAllCollections() {
     return http.get(`${collectionEndPoint}`);

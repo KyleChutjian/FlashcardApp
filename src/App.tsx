@@ -14,6 +14,7 @@ import { store, persistor } from './store/Store';
 import { PersistGate } from 'redux-persist/integration/react';
 import ViewCollection from './pages/ViewCollection';
 import Study from './pages/Study';
+import Results from './pages/Results';
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="collection/view/:collection_id" element={<ViewCollection />} />
               <Route path="study" element={<Study />} />
+              <Route path="results" element={<Results />} />
             </Routes>
           </BrowserRouter>
         </PersistGate>
