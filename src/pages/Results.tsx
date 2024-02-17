@@ -22,17 +22,10 @@ const Results = () => {
 
   useEffect(() => {
     if (location.state) {
-      console.log(location.state.flashcardResults);
       setFlashcardResults(location.state.flashcardResults)
-
       const correctFlashcards = location.state.flashcardResults?.filter((flashcard:FlashcardResult) => flashcard.isCorrect);
-      console.log(correctFlashcards.length);
       setTotalCorrectFlashcards(correctFlashcards?.length);
-      
-    } else {
-      console.log("uh oh")
     }
-  
   }, [location])
   
   return (

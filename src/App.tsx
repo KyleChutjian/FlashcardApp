@@ -15,6 +15,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import ViewCollection from './pages/ViewCollection';
 import Study from './pages/Study';
 import Results from './pages/Results';
+import Dictionary from './pages/Dictionary';
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
               <Route path="collection/view/:collection_id" element={<ViewCollection />} />
               <Route path="study" element={<Study />} />
               <Route path="results" element={<Results />} />
+              <Route path="dictionary" element={<Dictionary />} />
             </Routes>
           </BrowserRouter>
         </PersistGate>

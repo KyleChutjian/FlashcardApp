@@ -64,7 +64,6 @@ const Collections = () => {
   useEffect(() => {
     getCollectionsByUserId(userInfo.user_id).then((res: any) => {
       setCollections(res.data);
-      console.log(res.data);
       setSelectedCollectionsArray(res.data.map((collection: Collection) => ({
         collection_id: collection.collection_id,
         isSelected: false
