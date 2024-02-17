@@ -137,12 +137,10 @@ const Study = () => {
       setInputText(newInput);
 
       if (newInput.toLowerCase() === currentBackFlashcard.toLowerCase() && newInput !== "") {
-        console.log(frontFlashcards)
         setFrontFlashcards((currentFrontFlashcards: Array<FlashcardScore> | null) => {
           if (!currentFrontFlashcards) return null;
           const updatedFrontFlashcards = [...currentFrontFlashcards];
           updatedFrontFlashcards[currentFlashcardIndex].isCorrect = true;
-          console.log(`updated ${updatedFrontFlashcards[currentFlashcardIndex].front}`);
           return updatedFrontFlashcards;
         })
         setCurrentFlashcardIndex(currentFlashcardIndex+1);
@@ -150,18 +148,12 @@ const Study = () => {
     }
 
     const onSkip = () => {
-      if (currentFlashcardIndex+1 === totalFlashcardIndex) {
-        console.log("DONE!");
-        setInputText("");
-      } else {
         if (frontFlashcards && backFlashcards) {
           setCurrentFrontFlashcard(frontFlashcards[currentFlashcardIndex+1])
           setCurrentBackFlashcard(backFlashcards[currentFlashcardIndex+1])
           setCurrentFlashcardIndex(currentFlashcardIndex+1);
           setInputText("");
         }
-      }
-
     }
 
   return (

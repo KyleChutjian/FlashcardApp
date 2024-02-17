@@ -73,6 +73,19 @@ const Flashcards = () => {
         });
     };
 
+    const handleSaveAll = () => {
+        console.log("saving all flashcards");
+        
+        flashcards?.forEach(flashcard => {
+            updateFlashcard(flashcard).then((res) => {
+                if (res.status === 200) {
+                    console.log(`Flashcard ${flashcard.flashcard_id} has been updated`);
+                    console.log(res.data)
+                }
+            })
+        })
+    };
+
     const [isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(false);
     const [flashcardToDelete, setFlashcardToDelete ] = useState("");
 
@@ -149,7 +162,15 @@ const Flashcards = () => {
                             </tr>
                         })}
                         <tr>
-                            <td colSpan={5} className="p-3 px-2 text-center"><button onClick={(e) => handleCreateFlashcard()} className="text-white text-1xl bg-gray-900 font-semibold py-2 px-4 rounded w-[20%] mx-auto">Add Flashcard</button></td>
+                            <td colSpan={5} className="p-3 px-2 text-center">
+                                <div className="py-1">
+                                    <button onClick={(e) => handleCreateFlashcard()} className="text-white text-1xl bg-gray-900 font-semibold py-2 px-4 rounded w-[20%] mx-auto">Add Flashcard</button>
+                                </div>
+                                <div className="py-1">
+                                    <button onClick={(e) => handleSaveAll()} className="text-white text-1xl bg-blue-500 font-semibold py-2 px-4 rounded w-[20%] mx-auto">Save Changes</button>
+                                </div>
+                                
+                            </td>
                         </tr>
                     </tbody>
                 </table>
