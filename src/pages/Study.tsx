@@ -116,6 +116,23 @@ const Study = () => {
       });
     }, []);
 
+    useEffect(() => {
+      if (currentFlashcardIndex !== 0 && (currentFlashcardIndex === totalFlashcardIndex)) {
+        console.log("DONE!");
+        // SAVE RESULTS
+        router("/results", {state: {
+          flashcardResults: frontFlashcards
+        }});
+      } else {
+        if (frontFlashcards && backFlashcards) {
+          setCurrentFrontFlashcard(frontFlashcards[currentFlashcardIndex])
+          setCurrentBackFlashcard(backFlashcards[currentFlashcardIndex])
+          
+          setInputText("");
+        }
+      }
+    }, [currentFlashcardIndex]);
+
     const onChangeInput = (newInput: string) => {
       setInputText(newInput);
 
@@ -125,23 +142,10 @@ const Study = () => {
           if (!currentFrontFlashcards) return null;
           const updatedFrontFlashcards = [...currentFrontFlashcards];
           updatedFrontFlashcards[currentFlashcardIndex].isCorrect = true;
+          console.log(`updated ${updatedFrontFlashcards[currentFlashcardIndex].front}`);
           return updatedFrontFlashcards;
-        });
-
-        if (currentFlashcardIndex+1 === totalFlashcardIndex) {
-          console.log("DONE!");
-          // SAVE RESULTS
-          router("/results", {state: {
-            flashcardResults: frontFlashcards
-          }});
-        } else {
-          if (frontFlashcards && backFlashcards) {
-            setCurrentFrontFlashcard(frontFlashcards[currentFlashcardIndex+1])
-            setCurrentBackFlashcard(backFlashcards[currentFlashcardIndex+1])
-            setCurrentFlashcardIndex(currentFlashcardIndex+1);
-            setInputText("");
-          }
-        }
+        })
+        setCurrentFlashcardIndex(currentFlashcardIndex+1);
       }
     }
 

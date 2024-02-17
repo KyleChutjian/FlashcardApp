@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import { getCollectionById } from "../api";
-import Flashcards from "../components/Flashcards";
+import Flashcards from "../components/ManageFlashcards";
 
 const ViewCollection = () => {
     const { mode, collection_id} = useParams();

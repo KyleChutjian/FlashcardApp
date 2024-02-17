@@ -13,17 +13,12 @@ const Flashcards = () => {
         createdAt: string;
     }
 
-
-    const { mode, collection_id} = useParams();
-
+    const { collection_id} = useParams();
     const [ flashcards, setFlashcards ] = useState<Array<Flashcard> | null>(null);
-    // const [ flashcardArray, setFlashcardArray ] = useState<Array<Flashcard> | null>(null);
-
 
     useEffect(() => {
         if (collection_id) getFlashcardsByCollectionId(collection_id).then((res) => {
             setFlashcards(res.data);
-            // setFlashcardArray(res.data);
         });
     }, [])
     
@@ -73,7 +68,6 @@ const Flashcards = () => {
             if (res.status === 200) {
                 console.log("Flashcard successfully updated");
                 console.log(res.data)
-                // update flashcard?
             }
             
         });
