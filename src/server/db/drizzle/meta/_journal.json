@@ -15,6 +15,13 @@
       "when": 1706831200517,
       "tag": "0001_normal_hercules",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1708212326398,
+      "tag": "0002_dashing_magik",
+      "breakpoints": true
     }
   ]
 }

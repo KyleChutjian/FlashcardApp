@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 // user_id, email, name, password
 export const users = pgTable('users', {
@@ -17,6 +17,7 @@ export const collections = pgTable('collections', {
     collection_id: uuid('collection_id').defaultRandom().primaryKey(),
     user_id: uuid('user_id').references(() => users.user_id).notNull(),
     name: varchar('name', {length: 256}).notNull(),
+    numFlashcards: integer('numFlashcards').default(0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
@@ -30,6 +31,7 @@ export const flashcards = pgTable('flashcards', {
     english: varchar('english', {length: 256}).notNull(),
     romaji: varchar('romaji', {length: 256}).notNull(),
     kana: varchar('kana', {length: 256}).notNull(),
+    dictionary: boolean('dictionary').default(false).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull()
 });
 

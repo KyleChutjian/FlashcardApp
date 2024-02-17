@@ -8,7 +8,7 @@ async function main() {
     
     console.log("[migrate] Running migrations ...");
 
-    await migrate(db, { migrationsFolder: 'src/db/drizzle'});
+    await migrate(db, { migrationsFolder: 'src/server/db/drizzle'});
 
     console.log("[migrate] Migrations have ran, exiting ...")
 

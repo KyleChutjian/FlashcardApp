@@ -36,8 +36,11 @@ export async function getFlashcards(req: Request, res: Response): Promise<Respon
 export async function getFlashcardsByCollectionIds(req: Request, res: Response): Promise<Response> {
     try {
         const collectionIds = req.body.collectionIds;
-
-        const allFlashcards: Flashcard[] = await db.query.flashcards.findMany({
+        let allFlashcards;
+        if (collectionIds.length === 0) {
+            return res.status(200).send([]);
+        }
+        allFlashcards = await db.query.flashcards.findMany({
             where: inArray(flashcards.collection_id, collectionIds)
         });
 
@@ -83,13 +86,17 @@ export async function getFlashcardsByUserId(req: Request, res: Response): Promis
             where: eq(collections.user_id, user_id)
         });
 
-        // Convert [{"collection_id": "id"}] to ["id"]
         const collectionIdsArray: string[] = allCollectionIds.map(item => item.collection_id);
+        let allFlashcards;
 
-        // Get all flashcards in collectionIdsArray
-        const allFlashcards = await db.query.flashcards.findMany({
+        if (collectionIdsArray.length === 0) {
+            return res.status(200).send([]);
+        }
+
+        allFlashcards = await db.query.flashcards.findMany({
             where: inArray(flashcards.collection_id, collectionIdsArray)
         });
+        
 
         if (!allFlashcards || allFlashcards.length < 0) {
             return res.status(404).send({message: 'Error encountered'});

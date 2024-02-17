@@ -181,7 +181,7 @@ const Collections = () => {
 
   return (
     <section className="mb-5 pt-10">
-      <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>
+      {collections && collections.length !== 0 && <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>}
 
       {/* Collections Grid: */}
       <div className="flex justify-center w-[70%] mx-auto">

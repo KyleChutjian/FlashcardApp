@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { db } from '../../db/index';
 import { NewCollection, Collection, collections, flashcards } from '../../db/schema';
 import { eq } from "drizzle-orm";
-import { getFlashcardsByCollectionId } from '../flashcards/handlers'
 
 export async function getCollectionById(req: Request, res: Response): Promise<Response> {
     try {
@@ -60,7 +59,7 @@ export async function getCollectionsByUserId(req: Request, res: Response): Promi
             where: eq(collections.user_id, user_id)
         });
 
-        if (!allCollections || allCollections.length < 1) {
+        if (!allCollections || allCollections.length < 0) {
             return res.status(404).send({message: 'Error encountered'});
         }
 
