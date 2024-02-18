@@ -127,10 +127,10 @@ export async function createFlashcard(req: Request, res: Response): Promise<Resp
 
 export async function updateFlashcard(req: Request, res: Response): Promise<Response> {
     try {
-        const { flashcard_id, english, romaji, kana } = req.body;
+        const { flashcard_id, english, romaji, kana, dictionary } = req.body;
         const updatedFlashcards: NewFlashcard[] = await db
             .update(flashcards)
-            .set({english, romaji, kana})
+            .set({english, romaji, kana, dictionary})
             .where(eq(flashcards.flashcard_id, flashcard_id))
             .returning();
 

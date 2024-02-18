@@ -10,6 +10,7 @@ const Flashcards = () => {
         english: string;
         romaji: string;
         kana: string;
+        dictionary: boolean;
         createdAt: string;
     }
 
@@ -128,6 +129,35 @@ const Flashcards = () => {
         setIsConfirmationModalOpen(false);
     };
 
+    const handleDictionaryCheckbox = (flashcard: Flashcard, value: boolean) => {
+        console.log(`Changing flashcard ${flashcard.flashcard_id} to ${value}`);
+        updateFlashcard({
+            flashcard_id: flashcard.flashcard_id, 
+            english: flashcard.english, 
+            romaji: flashcard.romaji, 
+            kana: flashcard.kana, 
+            dictionary: value
+        }).then((res) => {
+            if (res.status === 200) {
+                console.log("Flashcard successfully updated");
+                console.log(res.data)
+                if (flashcards) {
+                    const flashcardIndex = flashcards.findIndex(val => val.flashcard_id === flashcard.flashcard_id);
+
+                    const newArr = [...flashcards];
+                    newArr[flashcardIndex].dictionary = value;
+                    console.log(newArr);
+                    setFlashcards(newArr);
+
+                }
+
+
+
+            }
+            
+        });
+    }
+
   return (
     <section className="mb-5 pt-5">
         <div className="text-gray-900 bg-gray-200 w-[90%] justify-center align-center mx-auto">
@@ -169,6 +199,11 @@ const Flashcards = () => {
                                             type="button"
                                             onClick={() => handleFlashcardDelete(flashcard.flashcard_id)}
                                             className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
+                                        <input
+                                            type="checkbox"
+                                            checked={flashcard.dictionary}
+                                            onChange={(e) => handleDictionaryCheckbox(flashcard, e.target.checked)}
+                                            className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 ml-3 rounded focus:outline-none focus:shadow-outline"/>
                                     </div>
                                 </td>
                             </tr>
