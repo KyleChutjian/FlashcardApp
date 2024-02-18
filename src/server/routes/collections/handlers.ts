@@ -89,10 +89,10 @@ export async function createCollection(req: Request, res: Response): Promise<Res
 export async function updateCollection(req: Request, res: Response): Promise<Response> {
     try {
         const collection_id = req.params.collection_id;
-        const { name } = req.body;
+        const { numFlashcards } = req.body;
         const updatedCollections: NewCollection[] = await db
             .update(collections)
-            .set({name: name})
+            .set({numFlashcards: numFlashcards})
             .where(eq(collections.collection_id, collection_id))
             .returning();
 

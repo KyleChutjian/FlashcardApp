@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-import { createFlashcard, getFlashcardsByCollectionId, updateFlashcard, deleteFlashcard } from "../api";
+import { createFlashcard, getFlashcardsByCollectionId, updateFlashcard, deleteFlashcard, updateCollection } from "../api";
 import ConfirmationModal from "./ConfirmationModal";
 
 const Flashcards = () => {
@@ -15,16 +15,18 @@ const Flashcards = () => {
 
     const { collection_id} = useParams();
     const [ flashcards, setFlashcards ] = useState<Array<Flashcard> | null>(null);
+    const [ numFlashcards, setNumFlashcards ] = useState(0);
 
     useEffect(() => {
         if (collection_id) getFlashcardsByCollectionId(collection_id).then((res) => {
             setFlashcards(res.data);
+            setNumFlashcards(res.data.length);
         });
     }, [])
     
-    const handleCreateFlashcard = () => {
+    const handleCreateFlashcard = async () => {
         console.log("Creating new flashcard");
-        createFlashcard({
+        await createFlashcard({
             collection_id: collection_id,
             english: "",
             romaji: "",
@@ -39,6 +41,11 @@ const Flashcards = () => {
                         return [res.data];
                     }
                 });
+                if (flashcards && collection_id) {
+                    setNumFlashcards(flashcards.length+1);
+                    updateCollection(collection_id, {numFlashcards: flashcards.length+1});
+                }
+                
             }
         });
     }
@@ -106,6 +113,11 @@ const Flashcards = () => {
                         return currentFlashcards.filter(flashcard => flashcard.flashcard_id !== flashcardToDelete);
                     } else return null
                 });
+                if (flashcards && collection_id) {
+                    setNumFlashcards(flashcards.length-1);
+                    updateCollection(collection_id, {numFlashcards: flashcards.length-1});
+                }
+
                 console.log(`TOAST: Successfully deleted ${res.data.name}`)
                 setIsConfirmationModalOpen(false);
             }
@@ -120,7 +132,7 @@ const Flashcards = () => {
     <section className="mb-5 pt-5">
         <div className="text-gray-900 bg-gray-200 w-[90%] justify-center align-center mx-auto">
             <div className="p-4 flex">
-                <h1 className="text-3xl">Flashcards</h1>
+                <h1 className="text-3xl">Flashcards: {numFlashcards}</h1>
             </div>
             <div className="px-3 py-4 flex justify-center">
                 <table className="w-full text-md bg-white shadow-md rounded mb-4">

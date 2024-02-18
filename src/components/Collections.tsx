@@ -10,6 +10,7 @@ type Collection = {
     collection_id: string,
     user_id: string,
     name: string,
+    numFlashcards: number
 }
 
 type SelectedCollection = {
@@ -187,11 +188,10 @@ const Collections = () => {
       <div className="flex justify-center w-[70%] mx-auto">
         <div className="grid grid-cols-3 gap-4 w-full">
           {collections && collections.map((collection, key) => {
-            // console.log(collection);
               return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
                   <div className="flex-1 max-w-[80%]">
                     <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
-                    <p className="text-gray-600">Flashcards: 0</p>
+                    <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
                   </div>
 
                   <div className="flex-1 flex justify-end items-center relative">
