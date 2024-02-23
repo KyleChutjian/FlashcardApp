@@ -71,6 +71,11 @@ export function updateCollection(collection_id: String, data: Object) {
     return http.patch(`${collectionEndPoint}/${collection_id}`, data);
 }
 
+// Update Collection Status By Id
+export function updateCollectionCategory(collection_id: String, category: String) {
+    return http.patch(`${collectionEndPoint}/${collection_id}/${category}`);
+}
+
 // Delete Collection By Id
 export function deleteCollection(collection_id: String) {
     return http.delete(`${collectionEndPoint}/${collection_id}`);

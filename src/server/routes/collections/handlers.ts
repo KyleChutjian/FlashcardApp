@@ -107,6 +107,26 @@ export async function updateCollection(req: Request, res: Response): Promise<Res
     }
 }
 
+export async function updateCollectionCategory(req: Request, res: Response): Promise<Response> {
+    try {
+        const {collection_id, category} = req.params;
+        const updatedCollections: NewCollection[] = await db
+            .update(collections)
+            .set({category: category})
+            .where(eq(collections.collection_id, collection_id))
+            .returning();
+
+        if (!updatedCollections || updatedCollections.length < 1) {
+            return res.status(404).send({message: 'Collection could not be updated'});
+        }
+
+        return res.send(updatedCollections[0]);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send({message: 'Error encountered'});
+    }
+}
+
 export async function deleteCollection(req: Request, res: Response): Promise<Response> {
     try {
         const collection_id = req.params.collection_id;

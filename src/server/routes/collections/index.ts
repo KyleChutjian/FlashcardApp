@@ -6,6 +6,7 @@ import {
     getCollectionsByUserId,
     createCollection,
     updateCollection,
+    updateCollectionCategory,
     deleteCollection
 } from './handlers';
 
@@ -17,4 +18,5 @@ router.get('/', getCollections);
 router.get('/user/:user_id', getCollectionsByUserId);
 router.post('/', createCollection);
 router.patch('/:collection_id', updateCollection);
+router.patch('/:collection_id/:category', updateCollectionCategory);
 router.delete('/:collection_id', deleteCollection);

@@ -1,12 +1,12 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { createCollection, deleteCollection, getCollectionsByUserId } from "../api";
+import { createCollection, deleteCollection, getCollectionsByUserId, updateCollectionCategory } from "../api";
 import ConfirmationModal from "./ConfirmationModal";
 import CreateCollectionModal from "./CreateCollectionModal";
 import { useAppDispatch, useAppSelector } from "../store/Store";
 import { setSelectedCollections } from "../store/slices";
 import { useNavigate } from "react-router-dom";
 import {Accordion, AccordionHeader, AccordionBody,} from "@material-tailwind/react";
-import { DragDropContext, Draggable, DropResult, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, DropResult, Droppable } from "@hello-pangea/dnd";
 
 type Collection = {
     collection_id: string;
@@ -209,7 +209,7 @@ const Collections = () => {
   };
 
   const [ isTodoOpen, setIsTodoOpen ] = useState(true);
-  const [ isBacklogOpen, setIsBacklogOpen ] = useState(false);
+  const [ isBacklogOpen, setIsBacklogOpen ] = useState(true);
   const [ isArchiveOpen, setIsArchiveOpen ] = useState(false);
 
   function Icon(isOpen: boolean): JSX.Element {
@@ -227,179 +227,240 @@ const Collections = () => {
     );
   };
    
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return null;
-
-    const dropLocation = result.source.index;
+    console.log(result);
+    const dropLocation = result.destination.droppableId;
     console.log(dropLocation);
+    await updateCollectionCategory(result.draggableId, dropLocation).then((res) => {
+      console.log(res);
+    })
   };
-
-  const getAccordionStatus = (accordionId: string): string => {
-    console.log(accordionId);
-    return "";
-  };
-
 
   return (
     <section className="mb-5 pt-10 mx-[25rem]">
-      {collections && collections.length !== 0 && <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        {collections && collections.length !== 0 && <h1 className="text-center font-extrabold text-gray-800 mb-5">Select Collections to Study</h1>}
 
-      {/* TODO Collections: */}
-      <Accordion placeholder={undefined} open={isTodoOpen} icon={Icon(isTodoOpen)} className="z-10">
-          <AccordionHeader onClick={(e) => setIsTodoOpen(!isTodoOpen)} placeholder={undefined}>TODO:</AccordionHeader>
-          <AccordionBody>
-            <div className="flex justify-center w-[100%] mx-auto">
-              <div className="grid grid-cols-3 gap-4 w-full">
-                {todoCollections && todoCollections.map((collection, key) => {
-                    return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
-                        <div className="flex-1 max-w-[80%]">
-                          <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
-                          <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
-                        </div>
+        {/* TODO Collections: */}
+        <Droppable droppableId="todo">
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <Accordion placeholder={undefined} open={isTodoOpen} icon={Icon(isTodoOpen)} className="mt-5">
+                <AccordionHeader onClick={() => setIsTodoOpen(!isTodoOpen)} placeholder={undefined}>TODO:</AccordionHeader>
+                <AccordionBody>
+                  <div className="flex justify-center w-[100%] mx-auto">
+                    <div className="grid grid-cols-3 gap-4 w-full">
+                      {todoCollections && todoCollections.map((collection, key) => (
+                        <Draggable key={key} draggableId={collection.collection_id} index={key}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
+                                <div className="flex-1 max-w-[80%]">
+                                  <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
+                                  <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
+                                </div>
 
-                        <div className="flex-1 flex justify-end items-center relative">
-                          {/* 3 dots button goes here with options: [View, Edit, Delete] */}
-                          <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
-                            <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
-                          </button>
-                          {/* Options Menu */}
+                                <div className="flex-1 flex justify-end items-center relative">
+                                  {/* 3 dots button goes here with options: [View, Edit, Delete] */}
+                                  <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
+                                    <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
+                                  </button>
+                                  {/* Options Menu */}
+                                  {openMenuId === collection.collection_id && (
+                                    <div ref={menuRef} className="absolute right-10 mt-2 w-24 bg-white rounded-lg shadow-lg z-20">
+                                      <ul>
+                                        <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
+                                        <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  <input 
+                                    type="checkbox"
+                                    checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
+                                    onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
+                                  />
+                                </div>
 
 
-                          <input 
-                            type="checkbox"
-                            checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
-                            onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
-                          />
-                        </div>
-
-
+                              </div>
+                            </div>)
+                          }
+                        </Draggable>
+                      ))}
                     </div>
-                })}
-              </div>
+                  </div>
+                </AccordionBody>
+              </Accordion>
             </div>
-          </AccordionBody>
-      </Accordion>
+          )}
+        </Droppable>
+
+        {/* Backlog Collections: */}
+        <Droppable droppableId="backlog">
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <Accordion placeholder={undefined} open={isBacklogOpen} icon={Icon(isBacklogOpen)} className="mt-5">
+                <AccordionHeader onClick={() => setIsBacklogOpen(!isBacklogOpen)} placeholder={undefined}>Backlog:</AccordionHeader>
+                <AccordionBody>
+                  <div className="flex justify-center w-[100%] mx-auto">
+                    <div className="grid grid-cols-3 gap-4 w-full">
+                      {backlogCollections && backlogCollections.map((collection, key) => (
+                        <Draggable key={key} draggableId={collection.collection_id} index={key}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
+                                <div className="flex-1 max-w-[80%]">
+                                  <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
+                                  <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
+                                </div>
+
+                                <div className="flex-1 flex justify-end items-center relative">
+                                  {/* 3 dots button goes here with options: [View, Edit, Delete] */}
+                                  <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
+                                    <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
+                                  </button>
+                                  {/* Options Menu */}
+                                  {openMenuId === collection.collection_id && (
+                                    <div ref={menuRef} className="absolute right-10 mt-2 w-24 bg-white rounded-lg shadow-lg z-20">
+                                      <ul>
+                                        <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
+                                        <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  <input 
+                                    type="checkbox"
+                                    checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
+                                    onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
+                                  />
+                                </div>
 
 
-      {/* Backlog Collections: */}
-      <Accordion placeholder={undefined} open={isBacklogOpen} icon={Icon(isTodoOpen)} className="mt-5">
-          <AccordionHeader onClick={(e) => setIsBacklogOpen(!isBacklogOpen)} placeholder={undefined}>Backlog:</AccordionHeader>
-          <AccordionBody>
-            <div className="flex justify-center w-[100%] mx-auto">
-              <div className="grid grid-cols-3 gap-4 w-full">
-                {backlogCollections && backlogCollections.map((collection, key) => {
-                    return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
-                        <div className="flex-1 max-w-[80%]">
-                          <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
-                          <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
-                        </div>
-
-                        <div className="flex-1 flex justify-end items-center relative">
-                          {/* 3 dots button goes here with options: [View, Edit, Delete] */}
-                          <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
-                            <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
-                          </button>
-                          {/* Options Menu */}
-                          {openMenuId === collection.collection_id && (
-                            <div ref={menuRef} className="absolute right-10 mt-2 w-24 bg-white rounded-lg shadow-lg z-20">
-                              <ul>
-                                <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
-                                <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
-                              </ul>
-                            </div>
-                          )}
-
-                          <input 
-                            type="checkbox"
-                            checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
-                            onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
-                          />
-                        </div>
-
-
+                              </div>
+                            </div>)
+                          }
+                        </Draggable>
+                      ))}
                     </div>
-                })}
-              </div>
+                  </div>
+                </AccordionBody>
+              </Accordion>
             </div>
-          </AccordionBody>
-      </Accordion>
-
-      {/* Archived Collections: */}
-      <Accordion placeholder={undefined} open={isArchiveOpen} icon={Icon(isTodoOpen)} className="mt-5">
-          <AccordionHeader onClick={(e) => setIsArchiveOpen(!isArchiveOpen)} placeholder={undefined}>Archived:</AccordionHeader>
-          <AccordionBody>
-            <div className="flex justify-center w-[100%] mx-auto">
-              <div className="grid grid-cols-3 gap-4 w-full">
-                {archivedCollections && archivedCollections.map((collection, key) => {
-                    return <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
-                        <div className="flex-1 max-w-[80%]">
-                          <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
-                          <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
-                        </div>
-
-                        <div className="flex-1 flex justify-end items-center relative">
-                          {/* 3 dots button goes here with options: [View, Edit, Delete] */}
-                          <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
-                            <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
-                          </button>
-                          {/* Options Menu */}
-                          {openMenuId === collection.collection_id && (
-                            <div ref={menuRef} className="absolute bottom-full right-0 mt-2 w-24 bg-white rounded-lg shadow-lg z-10">
-                              <ul>
-                                <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
-                                <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
-                              </ul>
-                            </div>
-                          )}
-
-                          <input 
-                            type="checkbox"
-                            checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
-                            onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
-                          />
-                        </div>
+          )}
 
 
+
+
+        </Droppable>
+
+
+        {/* Archived Collections: */}
+        <Droppable droppableId="archive">
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <Accordion placeholder={undefined} open={isArchiveOpen} icon={Icon(isArchiveOpen)} className="mt-5">
+                <AccordionHeader onClick={() => setIsArchiveOpen(!isArchiveOpen)} placeholder={undefined}>Archive:</AccordionHeader>
+                <AccordionBody>
+                  <div className="flex justify-center w-[100%] mx-auto">
+                    <div className="grid grid-cols-3 gap-4 w-full">
+                      {archivedCollections && archivedCollections.map((collection, key) => (
+                        <Draggable key={key} draggableId={collection.collection_id} index={key}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <div key={key} className="p-4 bg-white shadow-md rounded-lg flex relative">
+                                <div className="flex-1 max-w-[80%]">
+                                  <h2 className="text-lg font-semibold overflow-hidden whitespace-nowrap overflow-ellipsis">{collection.name}</h2>
+                                  <p className="text-gray-600">Flashcards: {collection.numFlashcards}</p>
+                                </div>
+
+                                <div className="flex-1 flex justify-end items-center relative">
+                                  {/* 3 dots button goes here with options: [View, Edit, Delete] */}
+                                  <button className="focus:outline-none" onClick={() => toggleOptionsMenu(collection.collection_id)}>
+                                    <img src={require("../images/moreOptions.png")} alt="Options" className="h-6 w-6" />
+                                  </button>
+                                  {/* Options Menu */}
+                                  {openMenuId === collection.collection_id && (
+                                    <div ref={menuRef} className="absolute right-10 mt-2 w-24 bg-white rounded-lg shadow-lg z-20">
+                                      <ul>
+                                        <li><button onClick={() => handleCollectionView(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">View</button></li>
+                                        <li><button onClick={() => handleCollectionDelete(collection.collection_id)} className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200">Delete</button></li>
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  <input 
+                                    type="checkbox"
+                                    checked={selectedCollectionsArray?.find(selectedCollection => selectedCollection.collection_id === collection.collection_id)?.isSelected}
+                                    onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
+                                  />
+                                </div>
+
+
+                              </div>
+                            </div>)
+                          }
+                        </Draggable>
+                      ))}
                     </div>
-                })}
-              </div>
+                  </div>
+                </AccordionBody>
+              </Accordion>
             </div>
-          </AccordionBody>
-      </Accordion>
+          )}
 
-      {/* Create New Collection */}
-      <div className="py-10 px-4 mx-auto max-w-screen-xl text-center">
-          <button 
-                  className="hover:text-gray-900 text-2xl bg-gray-900 font-extrabold  py-2 px-4 border text-white hover:bg-gray-100 border-gray-900 rounded"
-                  onClick={onOpenCreateCollection}
-          >Create New Collection</button>
-      </div>
-      
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        message="Are you sure you want to delete this collection?"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      />
 
-      {/* Create New Collection Modal */}
-      <CreateCollectionModal isOpen={isCreateCollectionOpen} onClose={onCloseCreateCollection}>
-          <div className="">
-              {/* Collection Name */}
-              <h1 className="block mb-3 text-lg">Create New Collection:</h1>
 
-              {/* Label */}
-              <input type="text" id="first_name" value={newCollectionName} onChange={onChangeCollectionName} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Collection Name" required/>
 
-              {/* Create Collection Button */}
-              <div className="flex justify-center align-center1 mt-3">
-                  <button onClick={handleCreateCollection} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
-              </div>
-          </div>
-          
-      </CreateCollectionModal>
+        </Droppable>
 
+        {/* Create New Collection */}
+        <div className="py-10 px-4 mx-auto max-w-screen-xl text-center">
+            <button 
+                    className="hover:text-gray-900 text-2xl bg-gray-900 font-extrabold  py-2 px-4 border text-white hover:bg-gray-100 border-gray-900 rounded"
+                    onClick={onOpenCreateCollection}
+            >Create New Collection</button>
+        </div>
+        
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          message="Are you sure you want to delete this collection?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+
+        {/* Create New Collection Modal */}
+        <CreateCollectionModal isOpen={isCreateCollectionOpen} onClose={onCloseCreateCollection}>
+            <div className="">
+                {/* Collection Name */}
+                <h1 className="block mb-3 text-lg">Create New Collection:</h1>
+
+                {/* Label */}
+                <input type="text" id="first_name" value={newCollectionName} onChange={onChangeCollectionName} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Collection Name" required/>
+
+                {/* Create Collection Button */}
+                <div className="flex justify-center align-center1 mt-3">
+                    <button onClick={handleCreateCollection} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
+                </div>
+            </div>
+            
+        </CreateCollectionModal>
+      </DragDropContext>
     </section>
 
   );
