@@ -18,6 +18,7 @@ export const collections = pgTable('collections', {
     user_id: uuid('user_id').references(() => users.user_id).notNull(),
     name: varchar('name', {length: 256}).notNull(),
     numFlashcards: integer('numFlashcards').default(0).notNull(),
+    category: varchar('category', {length: 50}).default("backlog").notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
