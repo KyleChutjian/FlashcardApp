@@ -5,8 +5,8 @@ import CreateCollectionModal from "./CreateCollectionModal";
 import { useAppDispatch, useAppSelector } from "../store/Store";
 import { setSelectedCollections } from "../store/slices";
 import { useNavigate } from "react-router-dom";
-import {Accordion, AccordionHeader, AccordionBody,} from "@material-tailwind/react";
-import { DragDropContext, Draggable, DropResult, Droppable } from "@hello-pangea/dnd";
+import { Accordion, AccordionHeader, AccordionBody } from "@material-tailwind/react";
+import { DragDropContext, Draggable, DraggableLocation, DropResult, Droppable } from "@hello-pangea/dnd";
 
 type Collection = {
     collection_id: string;
@@ -56,14 +56,6 @@ const Collections = () => {
 
   useEffect(() => {
     if (collections) {
-      const todo = collections.filter(collection => collection.category === "todo");
-      const backlog = collections.filter(collection => collection.category === "backlog");
-      const archive = collections.filter(collection => collection.category === "archive");
-      
-      // console.log(todo);
-      // console.log(backlog);
-      // console.log(archive);
-
       setTodoCollections(collections.filter(collection => collection.category === "todo"))
       setBacklogCollections(collections.filter(collection => collection.category === "backlog"));
       setArchivedCollections(collections.filter(collection => collection.category === "archive"));
@@ -96,10 +88,6 @@ const Collections = () => {
   });
   }, []);
 
-  const handleCollectionMove = (collection_id: string, location: string)  => {
-    console.log(`clicked on move collection for id: ${collection_id} to ${location}`);
-    router(`/collection/view/${collection_id}`);
-  };
   const handleCollectionView = (collection_id: string)  => {
     console.log(`clicked on view collection for id: ${collection_id}`);
     router(`/collection/view/${collection_id}`);
@@ -228,12 +216,20 @@ const Collections = () => {
   };
    
   const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination) return null;
-    console.log(result);
-    const dropLocation = result.destination.droppableId;
-    console.log(dropLocation);
-    await updateCollectionCategory(result.draggableId, dropLocation).then((res) => {
-      console.log(res);
+    if (!result.destination || !result.draggableId || !result.destination.droppableId) return null;
+    const destination = result.destination as DraggableLocation;
+    await updateCollectionCategory(result.draggableId, result.destination.droppableId).then(() => {
+      if (collections && result.draggableId && destination) {
+        const collectionIndex = collections.findIndex(collection => collection.collection_id === result.draggableId);
+        if (collectionIndex !== -1) {
+          const updatedCollections = [...collections];
+          updatedCollections[collectionIndex] = {
+            ...updatedCollections[collectionIndex],
+            category: destination.droppableId
+          }
+          setCollections(updatedCollections);
+        } else console.error(`Collection not found: ${collectionIndex}`);
+      } 
     })
   };
 
@@ -286,8 +282,6 @@ const Collections = () => {
                                     onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
                                   />
                                 </div>
-
-
                               </div>
                             </div>)
                           }
@@ -297,6 +291,7 @@ const Collections = () => {
                   </div>
                 </AccordionBody>
               </Accordion>
+              {provided.placeholder}
             </div>
           )}
         </Droppable>
@@ -345,8 +340,6 @@ const Collections = () => {
                                     onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
                                   />
                                 </div>
-
-
                               </div>
                             </div>)
                           }
@@ -356,14 +349,10 @@ const Collections = () => {
                   </div>
                 </AccordionBody>
               </Accordion>
+              {provided.placeholder}
             </div>
           )}
-
-
-
-
         </Droppable>
-
 
         {/* Archived Collections: */}
         <Droppable droppableId="archive">
@@ -409,8 +398,6 @@ const Collections = () => {
                                     onChange={(e) => onChangeCheckbox(collection.collection_id, e.target.checked)}
                                   />
                                 </div>
-
-
                               </div>
                             </div>)
                           }
@@ -420,16 +407,13 @@ const Collections = () => {
                   </div>
                 </AccordionBody>
               </Accordion>
+              {provided.placeholder}
             </div>
           )}
-
-
-
-
         </Droppable>
 
         {/* Create New Collection */}
-        <div className="py-10 px-4 mx-auto max-w-screen-xl text-center">
+        <div className="py-20 px-4 mx-auto max-w-screen-xl text-center md-20">
             <button 
                     className="hover:text-gray-900 text-2xl bg-gray-900 font-extrabold  py-2 px-4 border text-white hover:bg-gray-100 border-gray-900 rounded"
                     onClick={onOpenCreateCollection}
